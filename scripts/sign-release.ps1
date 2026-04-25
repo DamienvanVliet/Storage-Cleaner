@@ -80,8 +80,7 @@ Write-Host "  $publishExe"
 
 Invoke-Sign -SignToolPath $signToolPath -TargetPath $publishExe
 
-& (Join-Path $PSScriptRoot "package-portable-exe.ps1") -Configuration $Configuration -SkipPublish
 & (Join-Path $PSScriptRoot "package-installer.ps1") -Configuration $Configuration -SkipPublish
-& (Join-Path $PSScriptRoot "verify-release.ps1") -RequireValidSignature
+& (Join-Path $PSScriptRoot "verify-release.ps1") -ExePath $publishExe -RequireValidSignature
 
 Write-Host "Release signing and verification complete."

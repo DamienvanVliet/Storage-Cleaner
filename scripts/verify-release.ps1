@@ -1,5 +1,6 @@
 param(
     [string]$ReleaseDir = "",
+    [string]$ExePath = "",
     [switch]$RequireValidSignature
 )
 
@@ -41,28 +42,34 @@ function Assert-ChecksumMatches {
     Write-Host "Checksum OK: $(Split-Path $FilePath -Leaf)"
 }
 
-$exePath = Join-Path $ReleaseDir "StorageCleaner.exe"
-$exeChecksumPath = Join-Path $ReleaseDir "StorageCleaner.exe.sha256.txt"
-$portableZipPath = Join-Path $ReleaseDir "StorageCleaner-win-x64-portable.zip"
-$portableChecksumPath = Join-Path $ReleaseDir "StorageCleaner-win-x64-portable.sha256.txt"
 $installerZipPath = Join-Path $ReleaseDir "StorageCleaner-win-x64-installer.zip"
 $installerChecksumPath = Join-Path $ReleaseDir "StorageCleaner-win-x64-installer.sha256.txt"
 
-Assert-ChecksumMatches -FilePath $exePath -ChecksumFilePath $exeChecksumPath
-Assert-ChecksumMatches -FilePath $portableZipPath -ChecksumFilePath $portableChecksumPath
 Assert-ChecksumMatches -FilePath $installerZipPath -ChecksumFilePath $installerChecksumPath
 
-$signature = Get-AuthenticodeSignature -FilePath $exePath
-Write-Host "Digital signature status: $($signature.Status)"
-if ($signature.SignerCertificate -isnot [System.Security.Cryptography.X509Certificates.X509Certificate2]) {
-    Write-Host "Signer certificate: (none)"
-}
-else {
-    Write-Host "Signer certificate: $($signature.SignerCertificate.Subject)"
+if ([string]::IsNullOrWhiteSpace($ExePath)) {
+    $defaultExePath = Join-Path (Join-Path $repoRoot "artifacts\publish\win-x64") "StorageCleaner.exe"
+    if (Test-Path $defaultExePath) {
+        $ExePath = $defaultExePath
+    }
 }
 
-if ($RequireValidSignature -and $signature.Status -ne [System.Management.Automation.SignatureStatus]::Valid) {
-    throw "Executable signature is not valid. Status: $($signature.Status)"
+if (-not [string]::IsNullOrWhiteSpace($ExePath) -and (Test-Path $ExePath)) {
+    $signature = Get-AuthenticodeSignature -FilePath $ExePath
+    Write-Host "Digital signature status: $($signature.Status)"
+    if ($signature.SignerCertificate -isnot [System.Security.Cryptography.X509Certificates.X509Certificate2]) {
+        Write-Host "Signer certificate: (none)"
+    }
+    else {
+        Write-Host "Signer certificate: $($signature.SignerCertificate.Subject)"
+    }
+
+    if ($RequireValidSignature -and $signature.Status -ne [System.Management.Automation.SignatureStatus]::Valid) {
+        throw "Executable signature is not valid. Status: $($signature.Status)"
+    }
+}
+elseif ($RequireValidSignature) {
+    throw "RequireValidSignature was set, but no executable was found for signature validation."
 }
 
 Write-Host "Release verification completed."

@@ -4,26 +4,22 @@ Storage Cleaner is a Windows desktop app that helps you see what is using your d
 
 ## Download (easy)
 
-- Direct EXE (no install): [Download StorageCleaner.exe](https://github.com/DamienvanVliet/Storage-Cleaner/releases/latest/download/StorageCleaner.exe)
-- EXE checksum: [Download StorageCleaner.exe.sha256.txt](https://github.com/DamienvanVliet/Storage-Cleaner/releases/latest/download/StorageCleaner.exe.sha256.txt)
-- Portable EXE ZIP (no install): [Download StorageCleaner-win-x64-portable.zip](https://github.com/DamienvanVliet/Storage-Cleaner/releases/latest/download/StorageCleaner-win-x64-portable.zip)
-- Portable ZIP checksum: [Download StorageCleaner-win-x64-portable.sha256.txt](https://github.com/DamienvanVliet/Storage-Cleaner/releases/latest/download/StorageCleaner-win-x64-portable.sha256.txt)
 - Installer package: [Download StorageCleaner-win-x64-installer.zip](https://github.com/DamienvanVliet/Storage-Cleaner/releases/latest/download/StorageCleaner-win-x64-installer.zip)
 - Installer checksum: [Download StorageCleaner-win-x64-installer.sha256.txt](https://github.com/DamienvanVliet/Storage-Cleaner/releases/latest/download/StorageCleaner-win-x64-installer.sha256.txt)
 
 ## Trust checks (recommended)
 
-Before you run the EXE, you can verify that the file is exactly what was released.
+Before you install, verify the installer zip is exactly what was released.
 
-1. Download `StorageCleaner.exe` and `StorageCleaner.exe.sha256.txt`.
+1. Download `StorageCleaner-win-x64-installer.zip` and `StorageCleaner-win-x64-installer.sha256.txt`.
 2. In PowerShell:
    ```powershell
-   Get-FileHash .\StorageCleaner.exe -Algorithm SHA256
+   Get-FileHash .\StorageCleaner-win-x64-installer.zip -Algorithm SHA256
    ```
 3. Compare the hash with the text file.
-4. Optional signature check:
+4. Optional signature check after install:
    ```powershell
-   Get-AuthenticodeSignature .\StorageCleaner.exe
+   Get-AuthenticodeSignature "$env:LOCALAPPDATA\Programs\Storage Cleaner\StorageCleaner.exe"
    ```
 
 The project includes a release-signing script (`scripts\sign-release.ps1`) for code-sign certificates.  
@@ -46,25 +42,17 @@ It scans your drives and folders, shows exact folder sizes, and lets you clean d
 
 ## 3. How to install it
 
-### Option A: Portable EXE (no install)
+### Install (recommended)
 
-1. Download `StorageCleaner-win-x64-portable.zip` from the link above.
-2. Unzip it.
-3. Open `StorageCleaner.exe`.
-
-### Option B: Install to Start Menu (recommended)
-
-1. Build installer package:
-   ```powershell
-   .\scripts\package-installer.ps1
-   ```
-2. Open:
-   `artifacts\installer\StorageCleaner-win-x64`
-3. Run:
+1. Download and unzip `StorageCleaner-win-x64-installer.zip`.
+2. Open the folder.
+3. Run `Install-StorageCleaner.cmd` (double-click), or run:
    ```powershell
    powershell -ExecutionPolicy Bypass -File .\Install-StorageCleaner.ps1
    ```
-4. Start the app from the Start Menu: `Storage Cleaner`.
+4. The app is added to:
+   - Start Menu
+   - Installed Apps (Apps & features)
 
 ### Uninstall (installed version)
 
@@ -99,15 +87,7 @@ dotnet build .\StorageCleaner.sln -c Release
 dotnet test .\StorageCleaner.sln -c Release --no-build
 ```
 
-Publish portable release:
-```powershell
-.\scripts\publish-win-x64.ps1
-```
-
-Output:
-`artifacts\publish\win-x64`
-
-Create full release assets (portable + installer):
+Create installer release assets:
 ```powershell
 .\scripts\package-all.ps1
 ```

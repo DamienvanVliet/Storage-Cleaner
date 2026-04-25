@@ -33,6 +33,15 @@ function New-Shortcut {
     $shortcut.Save()
 }
 
+function Get-UninstallRegistryPath {
+    param([bool]$IsAdminInstall)
+    if ($IsAdminInstall) {
+        return "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\StorageCleaner"
+    }
+
+    return "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\StorageCleaner"
+}
+
 $scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $payloadRoot = Join-Path $scriptRoot "app"
 
@@ -74,6 +83,39 @@ if ($CreateDesktopShortcut) {
     New-Shortcut -ShortcutPath $desktopShortcutPath -TargetPath $exePath -WorkingDirectory $InstallRoot -IconPath $exePath
 }
 
+$displayVersion = (Get-Item -LiteralPath $exePath).VersionInfo.FileVersion
+if ([string]::IsNullOrWhiteSpace($displayVersion)) {
+    $displayVersion = "1.0.0"
+}
+
+$sizeBytes = (Get-ChildItem -LiteralPath $InstallRoot -Recurse -File -ErrorAction SilentlyContinue |
+    Measure-Object -Property Length -Sum).Sum
+if ($null -eq $sizeBytes) {
+    $sizeBytes = 0
+}
+$estimatedSizeKb = [int][Math]::Round($sizeBytes / 1KB)
+
+$uninstallRegistryPath = Get-UninstallRegistryPath -IsAdminInstall $isAdmin
+$uninstallCommand = "powershell.exe -ExecutionPolicy Bypass -NoProfile -File `"$uninstallScriptTarget`" -InstallRoot `"$InstallRoot`""
+
+if (-not (Test-Path $uninstallRegistryPath)) {
+    New-Item -Path $uninstallRegistryPath -Force | Out-Null
+}
+
+Set-ItemProperty -Path $uninstallRegistryPath -Name "DisplayName" -Value "Storage Cleaner"
+Set-ItemProperty -Path $uninstallRegistryPath -Name "DisplayVersion" -Value $displayVersion
+Set-ItemProperty -Path $uninstallRegistryPath -Name "Publisher" -Value "Damien van Vliet"
+Set-ItemProperty -Path $uninstallRegistryPath -Name "InstallLocation" -Value $InstallRoot
+Set-ItemProperty -Path $uninstallRegistryPath -Name "DisplayIcon" -Value "$exePath,0"
+Set-ItemProperty -Path $uninstallRegistryPath -Name "UninstallString" -Value $uninstallCommand
+Set-ItemProperty -Path $uninstallRegistryPath -Name "QuietUninstallString" -Value $uninstallCommand
+Set-ItemProperty -Path $uninstallRegistryPath -Name "URLInfoAbout" -Value "https://github.com/DamienvanVliet/Storage-Cleaner"
+Set-ItemProperty -Path $uninstallRegistryPath -Name "InstallDate" -Value (Get-Date -Format "yyyyMMdd")
+New-ItemProperty -Path $uninstallRegistryPath -Name "NoModify" -Value 1 -PropertyType DWord -Force | Out-Null
+New-ItemProperty -Path $uninstallRegistryPath -Name "NoRepair" -Value 1 -PropertyType DWord -Force | Out-Null
+New-ItemProperty -Path $uninstallRegistryPath -Name "EstimatedSize" -Value $estimatedSizeKb -PropertyType DWord -Force | Out-Null
+
 Write-Host "Install complete."
 Write-Host "Start Menu shortcut: $shortcutPath"
 Write-Host "Uninstall script: $uninstallScriptTarget"
+Write-Host "Installed Apps entry: $uninstallRegistryPath"

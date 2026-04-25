@@ -28,19 +28,28 @@ Copy-Item -Path (Join-Path $publishDir "*") -Destination (Join-Path $installerOu
 Copy-Item -Path (Join-Path $installerTemplateDir "Install-StorageCleaner.ps1") -Destination $installerOutputDir -Force
 Copy-Item -Path (Join-Path $installerTemplateDir "Uninstall-StorageCleaner.ps1") -Destination $installerOutputDir -Force
 
+$installCmdPath = Join-Path $installerOutputDir "Install-StorageCleaner.cmd"
+@"
+@echo off
+powershell -ExecutionPolicy Bypass -NoProfile -File "%~dp0Install-StorageCleaner.ps1"
+"@ | Set-Content -Path $installCmdPath -Encoding ASCII
+
 $quickStartPath = Join-Path $installerOutputDir "INSTALL.txt"
 @"
 Storage Cleaner Installer
 =========================
 
-1) Right-click Install-StorageCleaner.ps1 and run with PowerShell.
-2) If PowerShell blocks scripts, run:
-   powershell -ExecutionPolicy Bypass -File .\Install-StorageCleaner.ps1
-3) Use Uninstall-StorageCleaner.ps1 later to remove the app.
+1) Double-click Install-StorageCleaner.cmd
+2) This installs Storage Cleaner and adds it to Start Menu + Installed Apps
+3) To uninstall later, run Uninstall-StorageCleaner.ps1
 "@ | Set-Content -Path $quickStartPath -Encoding UTF8
 
 $releaseDir = Join-Path $repoRoot "artifacts\releases"
 New-Item -Path $releaseDir -ItemType Directory -Force | Out-Null
+
+Get-ChildItem -Path $releaseDir -Filter "StorageCleaner*" -File -ErrorAction SilentlyContinue |
+    Remove-Item -Force
+
 $zipPath = Join-Path $releaseDir "StorageCleaner-win-x64-installer.zip"
 if (Test-Path $zipPath) {
     Remove-Item -LiteralPath $zipPath -Force

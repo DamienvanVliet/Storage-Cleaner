@@ -22,8 +22,6 @@ Recommended steps:
 
 Each release includes SHA256 checksum files so users can verify downloads before running:
 
-- `StorageCleaner.exe.sha256.txt`
-- `StorageCleaner-win-x64-portable.sha256.txt`
 - `StorageCleaner-win-x64-installer.sha256.txt`
 
 The repository also includes:
