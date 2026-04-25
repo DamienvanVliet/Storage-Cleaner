@@ -10,6 +10,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\storage-cleaner-icon.ico</ApplicationIcon>
     <AssemblyName>StorageCleaner</AssemblyName>
     <RootNamespace>StorageCleaner.App</RootNamespace>

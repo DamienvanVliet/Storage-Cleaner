@@ -1,5 +1,6 @@
 param(
-    [string]$Configuration = "Release"
+    [string]$Configuration = "Release",
+    [switch]$SkipPublish
 )
 
 $ErrorActionPreference = "Stop"
@@ -7,8 +8,10 @@ $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $PSScriptRoot
 Set-Location $repoRoot
 
-$publishScript = Join-Path $PSScriptRoot "publish-win-x64.ps1"
-& $publishScript -Configuration $Configuration
+if (-not $SkipPublish) {
+    $publishScript = Join-Path $PSScriptRoot "publish-win-x64.ps1"
+    & $publishScript -Configuration $Configuration
+}
 
 $publishDir = Join-Path $repoRoot "artifacts\publish\win-x64"
 $installerTemplateDir = Join-Path $repoRoot "installer"
@@ -45,7 +48,13 @@ if (Test-Path $zipPath) {
 
 Compress-Archive -Path (Join-Path $installerOutputDir "*") -DestinationPath $zipPath -Force
 
+$checksumPath = Join-Path $releaseDir "StorageCleaner-win-x64-installer.sha256.txt"
+$hash = Get-FileHash -Path $zipPath -Algorithm SHA256
+"$($hash.Hash)  $(Split-Path $zipPath -Leaf)" | Set-Content -Path $checksumPath -Encoding ASCII
+
 Write-Host "Installer folder:"
 Write-Host "  $installerOutputDir"
 Write-Host "Installer zip:"
 Write-Host "  $zipPath"
+Write-Host "Installer checksum:"
+Write-Host "  $checksumPath"

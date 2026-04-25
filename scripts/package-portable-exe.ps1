@@ -1,5 +1,6 @@
 param(
-    [string]$Configuration = "Release"
+    [string]$Configuration = "Release",
+    [switch]$SkipPublish
 )
 
 $ErrorActionPreference = "Stop"
@@ -7,13 +8,16 @@ $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $PSScriptRoot
 Set-Location $repoRoot
 
-$publishScript = Join-Path $PSScriptRoot "publish-win-x64.ps1"
-& $publishScript -Configuration $Configuration
+if (-not $SkipPublish) {
+    $publishScript = Join-Path $PSScriptRoot "publish-win-x64.ps1"
+    & $publishScript -Configuration $Configuration
+}
 
 $publishDir = Join-Path $repoRoot "artifacts\publish\win-x64"
 $portableDir = Join-Path $repoRoot "artifacts\portable\StorageCleaner-win-x64"
 $releaseDir = Join-Path $repoRoot "artifacts\releases"
 $portableZip = Join-Path $releaseDir "StorageCleaner-win-x64-portable.zip"
+$releaseExe = Join-Path $releaseDir "StorageCleaner.exe"
 
 if (Test-Path $portableDir) {
     Remove-Item -LiteralPath $portableDir -Recurse -Force
@@ -32,6 +36,7 @@ if (-not (Test-Path $exePath)) {
 }
 
 Copy-Item -LiteralPath $exePath -Destination (Join-Path $portableDir "StorageCleaner.exe") -Force
+Copy-Item -LiteralPath $exePath -Destination $releaseExe -Force
 
 $portableReadme = Join-Path $portableDir "README.txt"
 @"
@@ -53,9 +58,17 @@ $checksumPath = Join-Path $releaseDir "StorageCleaner-win-x64-portable.sha256.tx
 $hash = Get-FileHash -Path $portableZip -Algorithm SHA256
 "$($hash.Hash)  $(Split-Path $portableZip -Leaf)" | Set-Content -Path $checksumPath -Encoding ASCII
 
+$exeChecksumPath = Join-Path $releaseDir "StorageCleaner.exe.sha256.txt"
+$exeHash = Get-FileHash -Path $releaseExe -Algorithm SHA256
+"$($exeHash.Hash)  $(Split-Path $releaseExe -Leaf)" | Set-Content -Path $exeChecksumPath -Encoding ASCII
+
 Write-Host "Portable folder:"
 Write-Host "  $portableDir"
 Write-Host "Portable zip:"
 Write-Host "  $portableZip"
+Write-Host "Portable EXE:"
+Write-Host "  $releaseExe"
 Write-Host "Checksum:"
 Write-Host "  $checksumPath"
+Write-Host "EXE checksum:"
+Write-Host "  $exeChecksumPath"

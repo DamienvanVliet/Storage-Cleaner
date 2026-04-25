@@ -5,8 +5,29 @@ Storage Cleaner is a Windows desktop app that helps you see what is using your d
 ## Download (easy)
 
 - Direct EXE (no install): [Download StorageCleaner.exe](https://github.com/DamienvanVliet/Storage-Cleaner/releases/latest/download/StorageCleaner.exe)
+- EXE checksum: [Download StorageCleaner.exe.sha256.txt](https://github.com/DamienvanVliet/Storage-Cleaner/releases/latest/download/StorageCleaner.exe.sha256.txt)
 - Portable EXE ZIP (no install): [Download StorageCleaner-win-x64-portable.zip](https://github.com/DamienvanVliet/Storage-Cleaner/releases/latest/download/StorageCleaner-win-x64-portable.zip)
+- Portable ZIP checksum: [Download StorageCleaner-win-x64-portable.sha256.txt](https://github.com/DamienvanVliet/Storage-Cleaner/releases/latest/download/StorageCleaner-win-x64-portable.sha256.txt)
 - Installer package: [Download StorageCleaner-win-x64-installer.zip](https://github.com/DamienvanVliet/Storage-Cleaner/releases/latest/download/StorageCleaner-win-x64-installer.zip)
+- Installer checksum: [Download StorageCleaner-win-x64-installer.sha256.txt](https://github.com/DamienvanVliet/Storage-Cleaner/releases/latest/download/StorageCleaner-win-x64-installer.sha256.txt)
+
+## Trust checks (recommended)
+
+Before you run the EXE, you can verify that the file is exactly what was released.
+
+1. Download `StorageCleaner.exe` and `StorageCleaner.exe.sha256.txt`.
+2. In PowerShell:
+   ```powershell
+   Get-FileHash .\StorageCleaner.exe -Algorithm SHA256
+   ```
+3. Compare the hash with the text file.
+4. Optional signature check:
+   ```powershell
+   Get-AuthenticodeSignature .\StorageCleaner.exe
+   ```
+
+The project includes a release-signing script (`scripts\sign-release.ps1`) for code-sign certificates.  
+When signed with a trusted certificate, Windows trust prompts improve.
 
 ## 1. What the app is
 
@@ -89,6 +110,16 @@ Output:
 Create full release assets (portable + installer):
 ```powershell
 .\scripts\package-all.ps1
+```
+
+Sign release assets with your code-signing certificate:
+```powershell
+.\scripts\sign-release.ps1 -PfxPath C:\path\your-cert.pfx -PfxPassword "your-password"
+```
+
+Verify all release files:
+```powershell
+.\scripts\verify-release.ps1
 ```
 
 ## 6. How each tab works

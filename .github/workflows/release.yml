@@ -1,0 +1,52 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Build and test
+        shell: pwsh
+        run: .\scripts\build.ps1
+
+      - name: Package release assets (unsigned)
+        if: ${{ secrets.STORAGE_CLEANER_PFX_BASE64 == '' }}
+        shell: pwsh
+        run: .\scripts\package-all.ps1
+
+      - name: Decode signing certificate
+        if: ${{ secrets.STORAGE_CLEANER_PFX_BASE64 != '' }}
+        shell: pwsh
+        run: |
+          $pfxPath = Join-Path $env:RUNNER_TEMP "storage-cleaner-signing.pfx"
+          [IO.File]::WriteAllBytes($pfxPath, [Convert]::FromBase64String("${{ secrets.STORAGE_CLEANER_PFX_BASE64 }}"))
+          "SIGNING_PFX_PATH=$pfxPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Package release assets (signed)
+        if: ${{ secrets.STORAGE_CLEANER_PFX_BASE64 != '' }}
+        shell: pwsh
+        env:
+          STORAGE_CLEANER_PFX_PASSWORD: ${{ secrets.STORAGE_CLEANER_PFX_PASSWORD }}
+        run: .\scripts\sign-release.ps1 -PfxPath "$env:SIGNING_PFX_PATH"
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/releases/*
+          generate_release_notes: true
