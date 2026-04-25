@@ -4,7 +4,8 @@ Storage Cleaner is a Windows desktop app that helps you see what is using your d
 
 ## Download (easy)
 
-- Portable EXE (no install): [Download StorageCleaner-win-x64-portable.zip](https://github.com/DamienvanVliet/Storage-Cleaner/releases/latest/download/StorageCleaner-win-x64-portable.zip)
+- Direct EXE (no install): [Download StorageCleaner.exe](https://github.com/DamienvanVliet/Storage-Cleaner/releases/latest/download/StorageCleaner.exe)
+- Portable EXE ZIP (no install): [Download StorageCleaner-win-x64-portable.zip](https://github.com/DamienvanVliet/Storage-Cleaner/releases/latest/download/StorageCleaner-win-x64-portable.zip)
 - Installer package: [Download StorageCleaner-win-x64-installer.zip](https://github.com/DamienvanVliet/Storage-Cleaner/releases/latest/download/StorageCleaner-win-x64-installer.zip)
 
 ## 1. What the app is
