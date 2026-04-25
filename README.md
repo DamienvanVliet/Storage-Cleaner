@@ -2,6 +2,11 @@
 
 Storage Cleaner is a Windows desktop app that helps you see what is using your disk space and clean files safely.
 
+## Download (easy)
+
+- Portable EXE (no install): [Download StorageCleaner-win-x64-portable.zip](https://github.com/DamienvanVliet/Storage-Cleaner/releases/latest/download/StorageCleaner-win-x64-portable.zip)
+- Installer package: [Download StorageCleaner-win-x64-installer.zip](https://github.com/DamienvanVliet/Storage-Cleaner/releases/latest/download/StorageCleaner-win-x64-installer.zip)
+
 ## 1. What the app is
 
 Storage Cleaner is a real WPF desktop application for Windows 10/11.
@@ -19,7 +24,13 @@ It scans your drives and folders, shows exact folder sizes, and lets you clean d
 
 ## 3. How to install it
 
-### Easy install (recommended)
+### Option A: Portable EXE (no install)
+
+1. Download `StorageCleaner-win-x64-portable.zip` from the link above.
+2. Unzip it.
+3. Open `StorageCleaner.exe`.
+
+### Option B: Install to Start Menu (recommended)
 
 1. Build installer package:
    ```powershell
@@ -33,7 +44,7 @@ It scans your drives and folders, shows exact folder sizes, and lets you clean d
    ```
 4. Start the app from the Start Menu: `Storage Cleaner`.
 
-### Uninstall
+### Uninstall (installed version)
 
 Run:
 ```powershell
@@ -73,6 +84,11 @@ Publish portable release:
 
 Output:
 `artifacts\publish\win-x64`
+
+Create full release assets (portable + installer):
+```powershell
+.\scripts\package-all.ps1
+```
 
 ## 6. How each tab works
 
