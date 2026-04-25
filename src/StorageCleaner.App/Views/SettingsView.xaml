@@ -1,0 +1,370 @@
+<UserControl x:Class="StorageCleaner.App.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+    <Grid Margin="20">
+        <Border Style="{StaticResource CardStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0">
+                    <TextBlock FontSize="22"
+                               FontWeight="SemiBold"
+                               Text="Settings" />
+                    <TextBlock Margin="0,6,0,16"
+                               Foreground="{DynamicResource SubtleTextBrush}"
+                               Text="Tune safety defaults and visual theme." />
+
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="220" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock VerticalAlignment="Center"
+                                   Text="Theme" />
+                        <ComboBox Grid.Column="1"
+                                  Width="200"
+                                  ItemsSource="{Binding ThemeModes}"
+                                  SelectedItem="{Binding SelectedTheme, Mode=TwoWay}" />
+                    </Grid>
+
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="220" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock VerticalAlignment="Center"
+                                   Text="Use Recycle Bin by default" />
+                        <CheckBox Grid.Column="1"
+                                  IsChecked="{Binding UseRecycleBinByDefault, Mode=TwoWay}" />
+                    </Grid>
+
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="220" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock VerticalAlignment="Center"
+                                   Text="Enable incremental scan cache" />
+                        <CheckBox Grid.Column="1"
+                                  IsChecked="{Binding EnableIncrementalScan, Mode=TwoWay}" />
+                    </Grid>
+
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="220" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock VerticalAlignment="Center"
+                                   Text="Queue locked deletes for reboot" />
+                        <CheckBox Grid.Column="1"
+                                  IsChecked="{Binding QueueLockedDeletesOnReboot, Mode=TwoWay}" />
+                    </Grid>
+
+                    <Grid Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="220" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock VerticalAlignment="Center"
+                                   Text="Max scan parallelism" />
+                        <TextBox Grid.Column="1"
+                                 Width="120"
+                                 Text="{Binding MaxScanParallelism, Mode=TwoWay}" />
+                    </Grid>
+
+                    <WrapPanel>
+                        <Button Margin="0,0,8,0"
+                                Command="{Binding ApplyThemeCommand}"
+                                Content="Apply Theme" />
+                        <Button Command="{Binding SaveCommand}"
+                                Content="Save Settings" />
+                    </WrapPanel>
+                </StackPanel>
+
+                <ScrollViewer Grid.Row="1"
+                              Margin="0,16,0,0"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel>
+                        <Border Padding="12"
+                                Background="{DynamicResource ElevatedSurfaceBrush}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="10">
+                            <StackPanel>
+                                <TextBlock FontWeight="SemiBold"
+                                           Text="Project Protection Profiles" />
+                                <TextBlock Margin="0,4,0,10"
+                                           Foreground="{DynamicResource SubtleTextBrush}"
+                                           Text="Protected roots are blocked from cleanup deletion." />
+                                <WrapPanel>
+                                    <Button Margin="0,0,8,0"
+                                            Command="{Binding DiscoverProfilesCommand}"
+                                            Content="Auto Discover" />
+                                    <TextBox Width="340"
+                                             Margin="0,0,8,0"
+                                             Text="{Binding NewProtectedRootPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    <Button Command="{Binding AddProtectedRootCommand}"
+                                            Content="Add Root" />
+                                </WrapPanel>
+                                <ListBox Margin="0,10,0,0"
+                                         Height="150"
+                                         ItemsSource="{Binding ProtectedProfileRoots}">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <DockPanel>
+                                                <Button DockPanel.Dock="Right"
+                                                        Margin="8,0,0,0"
+                                                        Command="{Binding DataContext.RemoveProtectedRootCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}"
+                                                        Content="Remove" />
+                                                <TextBlock VerticalAlignment="Center"
+                                                           Text="{Binding}" />
+                                            </DockPanel>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Margin="0,16,0,0"
+                                Padding="12"
+                                Background="{DynamicResource ElevatedSurfaceBrush}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="10">
+                            <StackPanel>
+                                <TextBlock FontWeight="SemiBold"
+                                           Text="Exclusion Engine" />
+                                <TextBlock Margin="0,4,0,10"
+                                           Foreground="{DynamicResource SubtleTextBrush}"
+                                           Text="Excluded paths/extensions/categories/apps are skipped during scan and cleanup." />
+
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="160" />
+                                        <ColumnDefinition Width="240" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <ComboBox Grid.Column="0"
+                                              Margin="0,0,8,0"
+                                              ItemsSource="{Binding ExclusionKinds}"
+                                              SelectedItem="{Binding SelectedExclusionKind, Mode=TwoWay}" />
+                                    <TextBlock Grid.Column="1"
+                                               VerticalAlignment="Center"
+                                               Text="Value:" />
+                                    <TextBox Grid.Column="2"
+                                             Margin="8,0,8,0"
+                                             Text="{Binding NewExclusionValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    <Button Grid.Column="3"
+                                            Command="{Binding AddExclusionRuleCommand}"
+                                            Content="Add Rule" />
+                                </Grid>
+
+                                <DataGrid AutoGenerateColumns="False"
+                                          IsReadOnly="True"
+                                          Height="190"
+                                          ItemsSource="{Binding ExclusionRules}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Binding="{Binding Kind, Mode=OneWay}"
+                                                            Header="Kind"
+                                                            Width="120" />
+                                        <DataGridTextColumn Binding="{Binding Value, Mode=OneWay}"
+                                                            Header="Value"
+                                                            Width="*" />
+                                        <DataGridTextColumn Binding="{Binding CreatedAt, Mode=OneWay, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}"
+                                                            Header="Created"
+                                                            Width="160" />
+                                        <DataGridTemplateColumn Header="Action"
+                                                                Width="100">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Button Padding="8,4"
+                                                            Command="{Binding DataContext.RemoveExclusionRuleCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                            CommandParameter="{Binding RuleId}"
+                                                            Content="Remove" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Margin="0,16,0,0"
+                                Padding="12"
+                                Background="{DynamicResource ElevatedSurfaceBrush}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="10">
+                            <StackPanel>
+                                <TextBlock FontWeight="SemiBold"
+                                           Text="Automation Rules" />
+                                <TextBlock Margin="0,4,0,10"
+                                           Foreground="{DynamicResource SubtleTextBrush}"
+                                           Text="Schedule safe recurring cleanup rules. Background scheduler only runs preview mode unless destructive execution is explicitly confirmed." />
+
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="220" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock VerticalAlignment="Center"
+                                               Text="Rule name" />
+                                    <TextBox Grid.Column="1"
+                                             Text="{Binding NewAutomationName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                </Grid>
+
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="220" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock VerticalAlignment="Center"
+                                               Text="Categories (comma separated)" />
+                                    <TextBox Grid.Column="1"
+                                             Text="{Binding NewAutomationCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                </Grid>
+
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="220" />
+                                        <ColumnDefinition Width="180" />
+                                        <ColumnDefinition Width="160" />
+                                        <ColumnDefinition Width="120" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock VerticalAlignment="Center"
+                                               Text="Schedule" />
+                                    <ComboBox Grid.Column="1"
+                                              Margin="8,0,8,0"
+                                              ItemsSource="{Binding AutomationFrequencies}"
+                                              SelectedItem="{Binding SelectedAutomationFrequency, Mode=TwoWay}" />
+                                    <ComboBox Grid.Column="2"
+                                              Margin="0,0,8,0"
+                                              ItemsSource="{Binding AutomationDays}"
+                                              SelectedItem="{Binding SelectedAutomationDay, Mode=TwoWay}" />
+                                    <TextBlock Grid.Column="3"
+                                               VerticalAlignment="Center"
+                                               Text="Time (HH:mm)" />
+                                    <TextBox Grid.Column="4"
+                                             Margin="8,0,0,0"
+                                             Text="{Binding NewAutomationTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                </Grid>
+
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="220" />
+                                        <ColumnDefinition Width="160" />
+                                        <ColumnDefinition Width="160" />
+                                        <ColumnDefinition Width="150" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock VerticalAlignment="Center"
+                                               Text="Retry policy / safe window" />
+                                    <TextBox Grid.Column="1"
+                                             Margin="8,0,8,0"
+                                             Text="{Binding NewAutomationMaxRetryCount, Mode=TwoWay}" />
+                                    <TextBox Grid.Column="2"
+                                             Margin="0,0,8,0"
+                                             Text="{Binding NewAutomationRetryBackoffMinutes, Mode=TwoWay}" />
+                                    <TextBox Grid.Column="3"
+                                             Margin="0,0,8,0"
+                                             Text="{Binding NewAutomationSafeWindowStart, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBox Grid.Column="4"
+                                             Text="{Binding NewAutomationSafeWindowEnd, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                </Grid>
+                                <TextBlock Margin="0,0,0,10"
+                                           Foreground="{DynamicResource SubtleTextBrush}"
+                                           Text="Retry order: max retries, backoff minutes, safe-window start, safe-window end (HH:mm)." />
+
+                                <WrapPanel Margin="0,0,0,10">
+                                    <CheckBox Margin="0,0,16,0"
+                                              IsChecked="{Binding NewAutomationPreviewOnly, Mode=TwoWay}"
+                                              Content="Preview only (recommended)" />
+                                    <CheckBox IsChecked="{Binding NewAutomationStrictSafety, Mode=TwoWay}"
+                                              Content="Strict safety filters" />
+                                </WrapPanel>
+
+                                <WrapPanel Margin="0,0,0,10">
+                                    <Button Margin="0,0,8,0"
+                                            Command="{Binding AddAutomationRuleCommand}"
+                                            Content="Add Rule" />
+                                    <Button Command="{Binding RefreshAutomationRulesCommand}"
+                                            Content="Refresh Rules" />
+                                </WrapPanel>
+
+                                <DataGrid AutoGenerateColumns="False"
+                                          IsReadOnly="True"
+                                          Height="210"
+                                          ItemsSource="{Binding AutomationRules}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Binding="{Binding Name, Mode=OneWay}"
+                                                            Header="Name"
+                                                            Width="170" />
+                                        <DataGridTextColumn Binding="{Binding Schedule, Mode=OneWay}"
+                                                            Header="Schedule"
+                                                            Width="190" />
+                                        <DataGridTextColumn Binding="{Binding Categories, Mode=OneWay}"
+                                                            Header="Categories"
+                                                            Width="*" />
+                                        <DataGridTextColumn Binding="{Binding PreviewOnly, Mode=OneWay}"
+                                                            Header="Preview"
+                                                            Width="80" />
+                                        <DataGridTextColumn Binding="{Binding StrictSafety, Mode=OneWay}"
+                                                            Header="Strict"
+                                                            Width="80" />
+                                        <DataGridTextColumn Binding="{Binding MaxRetryCount, Mode=OneWay}"
+                                                            Header="Retries"
+                                                            Width="75" />
+                                        <DataGridTextColumn Binding="{Binding RetryBackoff, Mode=OneWay}"
+                                                            Header="Backoff"
+                                                            Width="80" />
+                                        <DataGridTextColumn Binding="{Binding SafeWindow, Mode=OneWay}"
+                                                            Header="Safe Window"
+                                                            Width="140" />
+                                        <DataGridTextColumn Binding="{Binding NextRunAt, Mode=OneWay, StringFormat={}{0:yyyy-MM-dd HH:mm}}"
+                                                            Header="Next Run"
+                                                            Width="140" />
+                                        <DataGridTextColumn Binding="{Binding LastRunAt, Mode=OneWay, StringFormat={}{0:yyyy-MM-dd HH:mm}}"
+                                                            Header="Last Run"
+                                                            Width="140" />
+                                        <DataGridTemplateColumn Header="Run Now"
+                                                                Width="90">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Button Padding="8,4"
+                                                            Command="{Binding DataContext.RunAutomationNowCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                            CommandParameter="{Binding RuleId}"
+                                                            Content="Run" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                        <DataGridTemplateColumn Header="Action"
+                                                                Width="100">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Button Padding="8,4"
+                                                            Command="{Binding DataContext.RemoveAutomationRuleCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                            CommandParameter="{Binding RuleId}"
+                                                            Content="Remove" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8BEA93D3-FD39-4158-9F70-0E2F67616753}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StorageCleaner.Core", "src\StorageCleaner.Core\StorageCleaner.Core.csproj", "{10B7B049-10A7-43A5-84A2-035C09F7EDA8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StorageCleaner.App", "src\StorageCleaner.App\StorageCleaner.App.csproj", "{9530E8C5-B13F-4236-9EF3-7F2A0CF3C686}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{F12A9077-F63B-4B8E-8DB7-68B0B7C59649}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StorageCleaner.Core.Tests", "tests\StorageCleaner.Core.Tests\StorageCleaner.Core.Tests.csproj", "{B17C9B07-45BF-416F-BCF7-9B9D58E15E0B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StorageCleaner.Cli", "src\StorageCleaner.Cli\StorageCleaner.Cli.csproj", "{6EA65FDE-B573-46DD-AD1A-5BBBD911180F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{10B7B049-10A7-43A5-84A2-035C09F7EDA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10B7B049-10A7-43A5-84A2-035C09F7EDA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10B7B049-10A7-43A5-84A2-035C09F7EDA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10B7B049-10A7-43A5-84A2-035C09F7EDA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9530E8C5-B13F-4236-9EF3-7F2A0CF3C686}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9530E8C5-B13F-4236-9EF3-7F2A0CF3C686}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9530E8C5-B13F-4236-9EF3-7F2A0CF3C686}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9530E8C5-B13F-4236-9EF3-7F2A0CF3C686}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B17C9B07-45BF-416F-BCF7-9B9D58E15E0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B17C9B07-45BF-416F-BCF7-9B9D58E15E0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B17C9B07-45BF-416F-BCF7-9B9D58E15E0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B17C9B07-45BF-416F-BCF7-9B9D58E15E0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6EA65FDE-B573-46DD-AD1A-5BBBD911180F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6EA65FDE-B573-46DD-AD1A-5BBBD911180F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6EA65FDE-B573-46DD-AD1A-5BBBD911180F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6EA65FDE-B573-46DD-AD1A-5BBBD911180F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{10B7B049-10A7-43A5-84A2-035C09F7EDA8} = {8BEA93D3-FD39-4158-9F70-0E2F67616753}
+		{9530E8C5-B13F-4236-9EF3-7F2A0CF3C686} = {8BEA93D3-FD39-4158-9F70-0E2F67616753}
+		{B17C9B07-45BF-416F-BCF7-9B9D58E15E0B} = {F12A9077-F63B-4B8E-8DB7-68B0B7C59649}
+		{6EA65FDE-B573-46DD-AD1A-5BBBD911180F} = {8BEA93D3-FD39-4158-9F70-0E2F67616753}
+	EndGlobalSection
+EndGlobal

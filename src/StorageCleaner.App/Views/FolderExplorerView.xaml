@@ -1,0 +1,284 @@
+<UserControl x:Class="StorageCleaner.App.Views.FolderExplorerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0"
+                Style="{StaticResource CardStyle}">
+            <StackPanel>
+                <TextBlock FontSize="18"
+                           FontWeight="SemiBold"
+                           Text="Folder Explorer" />
+                <TextBlock Margin="0,4,0,12"
+                           Foreground="{DynamicResource SubtleTextBrush}"
+                           Text="Use the sortable table to inspect every scanned folder, then manage files from the detail panel." />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="12" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0"
+                             Height="34"
+                             VerticalContentAlignment="Center"
+                             Text="{Binding FolderSearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBox Grid.Column="2"
+                             Height="34"
+                             VerticalContentAlignment="Center"
+                             Text="{Binding FileSearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <Button Grid.Column="3"
+                            Margin="8,0,0,0"
+                            Command="{Binding SearchFilesCommand}"
+                            Content="Search Files" />
+                </Grid>
+                <WrapPanel Margin="0,10,0,0">
+                    <TextBlock Margin="0,0,8,0"
+                               Foreground="{DynamicResource SubtleTextBrush}"
+                               Text="Folder filter:" />
+                    <TextBlock Margin="0,0,16,0"
+                               Text="{Binding FolderSearchText}" />
+                    <TextBlock Margin="0,0,8,0"
+                               Foreground="{DynamicResource SubtleTextBrush}"
+                               Text="File query:" />
+                    <TextBlock Text="{Binding FileSearchText}" />
+                </WrapPanel>
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="1"
+              Margin="0,16,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="2*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0"
+                    Margin="0,0,12,0"
+                    Style="{StaticResource CardStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0"
+                               FontWeight="SemiBold"
+                               Text="All Scanned Folders (Sortable)" />
+
+                    <DataGrid Grid.Row="1"
+                              Margin="0,8,0,0"
+                              AutoGenerateColumns="False"
+                              CanUserSortColumns="True"
+                              EnableRowVirtualization="True"
+                              EnableColumnVirtualization="True"
+                              IsReadOnly="True"
+                              ItemsSource="{Binding AllFoldersView}"
+                              SelectedItem="{Binding SelectedAllFolder, Mode=TwoWay}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding Name, Mode=OneWay}"
+                                                Header="Name"
+                                                SortMemberPath="Name"
+                                                Width="200" />
+                            <DataGridTemplateColumn Header="Path"
+                                                    SortMemberPath="FullPath"
+                                                    Width="2*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button HorizontalAlignment="Left"
+                                                Padding="0"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                Foreground="{DynamicResource AccentBrush}"
+                                                Command="{Binding DataContext.OpenFolderPathCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding FullPath}"
+                                                Content="{Binding FullPath, Mode=OneWay}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Binding="{Binding SizeBytes, Mode=OneWay, Converter={StaticResource BytesToSizeConverter}}"
+                                                Header="Size"
+                                                SortMemberPath="SizeBytes"
+                                                Width="120" />
+                            <DataGridTextColumn Binding="{Binding Percentage, Mode=OneWay, Converter={StaticResource PercentToDisplayConverter}}"
+                                                Header="Percent"
+                                                SortMemberPath="Percentage"
+                                                Width="90" />
+                            <DataGridTextColumn Binding="{Binding FileCount, Mode=OneWay, StringFormat={}{0:N0}}"
+                                                Header="Files"
+                                                SortMemberPath="FileCount"
+                                                Width="90" />
+                            <DataGridTextColumn Binding="{Binding FolderCount, Mode=OneWay, StringFormat={}{0:N0}}"
+                                                Header="Folders"
+                                                SortMemberPath="FolderCount"
+                                                Width="90" />
+                            <DataGridTextColumn Binding="{Binding LastModifiedUtc, Mode=OneWay, StringFormat={}{0:yyyy-MM-dd HH:mm}}"
+                                                Header="Modified"
+                                                SortMemberPath="LastModifiedUtc"
+                                                Width="140" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <Border Grid.Row="2"
+                            Margin="0,10,0,0"
+                            Padding="8"
+                            Background="{DynamicResource ElevatedSurfaceBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8">
+                        <StackPanel>
+                            <TextBlock FontWeight="SemiBold"
+                                       Text="Folder Matches" />
+                            <ListBox Height="100"
+                                     Margin="0,6,0,0"
+                                     ItemsSource="{Binding FolderSearchResults}"
+                                     SelectedItem="{Binding SelectedFolder, Mode=TwoWay}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding FullPath}"
+                                                   TextTrimming="CharacterEllipsis" />
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="1"
+                    Style="{StaticResource CardStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0">
+                        <TextBlock FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Text="{Binding SelectedFolder.FullPath}" />
+                        <WrapPanel Margin="0,8,0,0">
+                            <Button Margin="0,0,8,0"
+                                    Command="{Binding OpenFolderCommand}"
+                                    Content="Open" />
+                            <Button Margin="0,0,8,0"
+                                    Command="{Binding CopyFolderPathCommand}"
+                                    Content="Copy Path" />
+                            <Button Margin="0,0,8,0"
+                                    Command="{Binding DeleteFolderCommand}"
+                                    ToolTip="Moves folder to Recycle Bin after confirmation and backup."
+                                    Content="Delete Folder" />
+                            <Button Command="{Binding RescanSelectedFolderCommand}"
+                                    Content="Rescan Folder" />
+                        </WrapPanel>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1"
+                                Margin="0,12,0,0">
+                        <TextBlock FontWeight="SemiBold"
+                                   Text="Files In Selected Folder" />
+                        <DataGrid Height="220"
+                                  Margin="0,8,0,0"
+                                  AutoGenerateColumns="False"
+                                  ItemsSource="{Binding FolderFiles}"
+                                  SelectedItem="{Binding SelectedFolderFile, Mode=TwoWay}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding Name, Mode=OneWay}"
+                                                    Header="Name"
+                                                    Width="*" />
+                                <DataGridTextColumn Binding="{Binding SizeBytes, Mode=OneWay, Converter={StaticResource BytesToSizeConverter}}"
+                                                    Header="Size"
+                                                    Width="90" />
+                                <DataGridTemplateColumn Header="Path"
+                                                        Width="2*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button HorizontalAlignment="Left"
+                                                    Padding="0"
+                                                    Background="Transparent"
+                                                    BorderThickness="0"
+                                                    Foreground="{DynamicResource AccentBrush}"
+                                                    Command="{Binding DataContext.OpenFilePathCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding FullPath}"
+                                                    Content="{Binding FullPath, Mode=OneWay}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Binding="{Binding LastModifiedUtc, Mode=OneWay, StringFormat={}{0:yyyy-MM-dd HH:mm}}"
+                                                    Header="Modified"
+                                                    Width="140" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <WrapPanel Margin="0,8,0,0">
+                            <Button Margin="0,0,8,0"
+                                    Command="{Binding OpenFileLocationCommand}"
+                                    Content="Open File Location" />
+                            <Button Command="{Binding DeleteFileCommand}"
+                                    ToolTip="Moves file to Recycle Bin after confirmation and backup."
+                                    Content="Delete File" />
+                        </WrapPanel>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="2"
+                                Margin="0,12,0,0">
+                        <TextBlock FontWeight="SemiBold"
+                                   Text="File Search Results" />
+                        <DataGrid Height="220"
+                                  Margin="0,8,0,0"
+                                  AutoGenerateColumns="False"
+                                  ItemsSource="{Binding FileSearchResults}"
+                                  SelectedItem="{Binding SelectedSearchFile, Mode=TwoWay}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding Name, Mode=OneWay}"
+                                                    Header="Name"
+                                                    Width="*" />
+                                <DataGridTemplateColumn Header="Folder"
+                                                        Width="220">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button HorizontalAlignment="Left"
+                                                    Padding="0"
+                                                    Background="Transparent"
+                                                    BorderThickness="0"
+                                                    Foreground="{DynamicResource AccentBrush}"
+                                                    Command="{Binding DataContext.OpenFolderPathCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding ParentFolder}"
+                                                    Content="{Binding ParentFolder, Mode=OneWay}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn Header="Path"
+                                                        Width="2*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button HorizontalAlignment="Left"
+                                                    Padding="0"
+                                                    Background="Transparent"
+                                                    BorderThickness="0"
+                                                    Foreground="{DynamicResource AccentBrush}"
+                                                    Command="{Binding DataContext.OpenFilePathCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding FullPath}"
+                                                    Content="{Binding FullPath, Mode=OneWay}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Binding="{Binding SizeBytes, Mode=OneWay, Converter={StaticResource BytesToSizeConverter}}"
+                                                    Header="Size"
+                                                    Width="90" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

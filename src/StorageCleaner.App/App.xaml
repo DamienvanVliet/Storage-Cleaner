@@ -1,0 +1,18 @@
+<Application x:Class="StorageCleaner.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:StorageCleaner.App.Converters">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/SharedStyles.xaml" />
+                <ResourceDictionary Source="Themes/Theme.Dark.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <converters:BytesToSizeConverter x:Key="BytesToSizeConverter" />
+            <converters:PercentToDisplayConverter x:Key="PercentToDisplayConverter" />
+            <converters:ViewportToColumnsConverter x:Key="ViewportToColumnsConverter" />
+            <converters:ViewportToTileWidthConverter x:Key="ViewportToTileWidthConverter" />
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

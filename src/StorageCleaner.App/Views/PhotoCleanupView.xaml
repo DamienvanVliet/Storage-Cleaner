@@ -1,0 +1,471 @@
+<UserControl x:Class="StorageCleaner.App.Views.PhotoCleanupView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:models="clr-namespace:StorageCleaner.App.Models"
+             mc:Ignorable="d">
+    <UserControl.InputBindings>
+        <KeyBinding Modifiers="Ctrl"
+                    Key="R"
+                    Command="{Binding ScanMediaCommand}" />
+        <KeyBinding Modifiers="Ctrl+Shift"
+                    Key="A"
+                    Command="{Binding SelectAllSafeItemsCommand}" />
+    </UserControl.InputBindings>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0"
+                Style="{StaticResource CardStyle}">
+            <StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock FontSize="22"
+                                   FontWeight="SemiBold"
+                                   Text="Photo Cleanup" />
+                        <TextBlock Margin="0,4,0,0"
+                                   Foreground="{DynamicResource SubtleTextBrush}"
+                                   Text="Scan photos and media, group risky duplicates, and clean only after preview.">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility"
+                                            Value="Visible" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsCompactMode}"
+                                                     Value="True">
+                                            <Setter Property="Visibility"
+                                                    Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </StackPanel>
+                    <CheckBox Grid.Column="1"
+                              Margin="12,0,0,0"
+                              VerticalAlignment="Center"
+                              IsChecked="{Binding IsCompactMode, Mode=TwoWay}">
+                        <TextBlock Text="Compact mode" />
+                    </CheckBox>
+                </Grid>
+
+                <Grid Margin="0,12,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <ComboBox Grid.Column="0"
+                              Height="34"
+                              ItemsSource="{Binding AvailableRoots}"
+                              SelectedItem="{Binding SelectedRootPath, Mode=TwoWay}" />
+                    <Button Grid.Column="1"
+                            Margin="8,0,0,0"
+                            Command="{Binding RefreshRootsCommand}"
+                            Content="Refresh" />
+                    <Button Grid.Column="2"
+                            Margin="8,0,0,0"
+                            Command="{Binding BrowseFolderCommand}"
+                            Content="Browse" />
+                    <Button Grid.Column="3"
+                            Margin="8,0,0,0"
+                            Command="{Binding ExportReportCommand}"
+                            Content="Export Report" />
+                    <Button Grid.Column="4"
+                            Margin="8,0,0,0"
+                            Command="{Binding ScanMediaCommand}"
+                            Content="Scan Media" />
+                </Grid>
+
+                <Grid Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <ComboBox Grid.Column="0"
+                              Height="34"
+                              ItemsSource="{Binding AvailableCategoryFilters}"
+                              SelectedItem="{Binding SelectedCategoryFilter, Mode=TwoWay}" />
+                    <TextBox Grid.Column="1"
+                             Margin="8,0,0,0"
+                             ToolTip="Filter by file name or path"
+                             Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <Button Grid.Column="2"
+                            Margin="8,0,0,0"
+                            Command="{Binding SelectAllSafeItemsCommand}"
+                            Content="Select Safe" />
+                    <Button Grid.Column="3"
+                            Margin="8,0,0,0"
+                            Command="{Binding SelectNoneCommand}"
+                            Content="Select None" />
+                    <Button Grid.Column="4"
+                            Margin="8,0,0,0"
+                            Command="{Binding SelectSimilarDuplicatesCommand}"
+                            Content="Select Similar Duplicates" />
+                </Grid>
+
+                <UniformGrid Margin="0,12,0,0"
+                             Columns="4">
+                    <Border Margin="0,0,8,0"
+                            Padding="10"
+                            Background="{DynamicResource ElevatedSurfaceBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8">
+                        <StackPanel>
+                            <TextBlock Foreground="{DynamicResource SubtleTextBrush}"
+                                       Text="Similar Photos" />
+                            <TextBlock FontSize="20"
+                                       FontWeight="SemiBold"
+                                       Text="{Binding SimilarGroupCount, StringFormat={}{0:N0}}" />
+                        </StackPanel>
+                    </Border>
+                    <Border Margin="0,0,8,0"
+                            Padding="10"
+                            Background="{DynamicResource ElevatedSurfaceBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8">
+                        <StackPanel>
+                            <TextBlock Foreground="{DynamicResource SubtleTextBrush}"
+                                       Text="Screenshots" />
+                            <TextBlock FontSize="20"
+                                       FontWeight="SemiBold"
+                                       Text="{Binding ScreenshotCount, StringFormat={}{0:N0}}" />
+                        </StackPanel>
+                    </Border>
+                    <Border Margin="0,0,8,0"
+                            Padding="10"
+                            Background="{DynamicResource ElevatedSurfaceBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8">
+                        <StackPanel>
+                            <TextBlock Foreground="{DynamicResource SubtleTextBrush}"
+                                       Text="Large Videos" />
+                            <TextBlock FontSize="20"
+                                       FontWeight="SemiBold"
+                                       Text="{Binding LargeVideoCount, StringFormat={}{0:N0}}" />
+                        </StackPanel>
+                    </Border>
+                    <Border Padding="10"
+                            Background="{DynamicResource ElevatedSurfaceBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8">
+                        <StackPanel>
+                            <TextBlock Foreground="{DynamicResource SubtleTextBrush}"
+                                       Text="Blurry Photos" />
+                            <TextBlock FontSize="20"
+                                       FontWeight="SemiBold"
+                                       Text="{Binding BlurryCount, StringFormat={}{0:N0}}" />
+                        </StackPanel>
+                    </Border>
+                </UniformGrid>
+
+                <WrapPanel Margin="0,10,0,0">
+                    <TextBlock Margin="0,0,16,0"
+                               Foreground="{DynamicResource SubtleTextBrush}"
+                               Text="{Binding TotalMediaCount, StringFormat=Media: {0:N0}}" />
+                    <TextBlock Margin="0,0,16,0"
+                               Foreground="{DynamicResource SubtleTextBrush}"
+                               Text="{Binding TotalMediaBytes, Converter={StaticResource BytesToSizeConverter}, StringFormat=Size: {0}}" />
+                    <TextBlock Margin="0,0,16,0"
+                               Foreground="{DynamicResource SubtleTextBrush}"
+                               Text="{Binding SelectedCount, StringFormat=Selected: {0:N0}}" />
+                    <TextBlock Margin="0,0,16,0"
+                               Foreground="{DynamicResource SubtleTextBrush}"
+                               Text="{Binding SelectedBytes, Converter={StaticResource BytesToSizeConverter}, StringFormat=Selected size: {0}}" />
+                    <TextBlock Margin="0,0,16,0"
+                               Foreground="{DynamicResource SubtleTextBrush}"
+                               Text="{Binding SelectedSafeCount, StringFormat=Safe selections: {0:N0}}" />
+                    <TextBlock Foreground="{DynamicResource DangerBrush}"
+                               Text="{Binding SelectedRiskyCount, StringFormat=Needs review: {0:N0}}" />
+                </WrapPanel>
+
+                <ProgressBar Margin="0,8,0,0"
+                             Height="12"
+                             IsIndeterminate="True">
+                    <ProgressBar.Style>
+                        <Style TargetType="ProgressBar"
+                               BasedOn="{StaticResource {x:Type ProgressBar}}">
+                            <Setter Property="Visibility"
+                                    Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsBusy}"
+                                             Value="True">
+                                    <Setter Property="Visibility"
+                                            Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ProgressBar.Style>
+                </ProgressBar>
+
+                <TextBlock Margin="0,8,0,0"
+                           Foreground="{DynamicResource SubtleTextBrush}"
+                           Text="{Binding StatusText}" />
+
+                <Border Margin="0,8,0,0"
+                        Padding="10"
+                        Background="{DynamicResource ElevatedSurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Visibility"
+                                    Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ShowPermissionWarning}"
+                                             Value="True">
+                                    <Setter Property="Visibility"
+                                            Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <TextBlock Foreground="{DynamicResource SubtleTextBrush}"
+                               Text="{Binding PermissionWarningText}" />
+                </Border>
+
+                <Border Margin="0,8,0,0"
+                        Padding="10"
+                        Background="{DynamicResource ElevatedSurfaceBrush}"
+                        BorderBrush="{DynamicResource AccentBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Visibility"
+                                    Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ShowSuccessBanner}"
+                                             Value="True">
+                                    <Setter Property="Visibility"
+                                            Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <TextBlock Text="{Binding SuccessBannerText}" />
+                </Border>
+
+                <Border Margin="0,8,0,0"
+                        Padding="10"
+                        Background="{DynamicResource ElevatedSurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Visibility"
+                                    Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ShowUndoBanner}"
+                                             Value="True">
+                                    <Setter Property="Visibility"
+                                            Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <DockPanel>
+                        <TextBlock VerticalAlignment="Center"
+                                   Text="{Binding UndoBannerText}" />
+                        <Button DockPanel.Dock="Right"
+                                Margin="12,0,0,0"
+                                Command="{Binding DataContext.NavigateToSectionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                CommandParameter="{x:Static models:NavigationSection.AdvancedTools}"
+                                Content="Open Restore Center" />
+                    </DockPanel>
+                </Border>
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="1"
+                Margin="0,16,0,0"
+                Style="{StaticResource CardStyle}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2.2*" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Column="0"
+                      Margin="0,0,10,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition x:Name="SimilarGroupsRowDefinition"
+                                       Height="180" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <DataGrid Grid.Row="0"
+                              Margin="0,0,0,10"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              ItemsSource="{Binding SimilarGroups}"
+                              SelectedItem="{Binding SelectedSimilarGroup, Mode=TwoWay}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding GroupId, Mode=OneWay}"
+                                                Header="Group"
+                                                Width="100" />
+                            <DataGridTextColumn Binding="{Binding Count, Mode=OneWay, StringFormat={}{0:N0}}"
+                                                Header="Items"
+                                                Width="80" />
+                            <DataGridTextColumn Binding="{Binding TotalBytes, Mode=OneWay, Converter={StaticResource BytesToSizeConverter}}"
+                                                Header="Total"
+                                                Width="110" />
+                            <DataGridTextColumn Binding="{Binding RecommendedKeepName, Mode=OneWay}"
+                                                Header="Recommended Keep"
+                                                Width="*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <Grid Grid.Row="1">
+                        <DataGrid AutoGenerateColumns="False"
+                                  ItemsSource="{Binding FilteredResults}"
+                                  SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
+                            <DataGrid.Columns>
+                                <DataGridCheckBoxColumn Binding="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                        Header="Select"
+                                                        Width="65" />
+                                <DataGridTextColumn Binding="{Binding Recommendation, Mode=OneWay}"
+                                                    Header="Recommendation"
+                                                    Width="115" />
+                                <DataGridTextColumn Binding="{Binding SafetyScore, Mode=OneWay}"
+                                                    Header="Safety"
+                                                    Width="70" />
+                                <DataGridTextColumn Binding="{Binding TypeLabel, Mode=OneWay}"
+                                                    Header="Type"
+                                                    Width="100" />
+                                <DataGridTextColumn Binding="{Binding Name, Mode=OneWay}"
+                                                    Header="Name"
+                                                    Width="170" />
+                                <DataGridTextColumn Binding="{Binding ParentFolder, Mode=OneWay}"
+                                                    Header="Folder"
+                                                    Width="*" />
+                                <DataGridTextColumn Binding="{Binding SizeBytes, Mode=OneWay, Converter={StaticResource BytesToSizeConverter}}"
+                                                    Header="Size"
+                                                    Width="100" />
+                                <DataGridTextColumn Binding="{Binding LastModifiedUtc, Mode=OneWay, StringFormat={}{0:yyyy-MM-dd HH:mm}}"
+                                                    Header="Modified"
+                                                    Width="140" />
+                                <DataGridTextColumn Binding="{Binding RiskLabel, Mode=OneWay}"
+                                                    Header="Risk"
+                                                    Width="75" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <Border Padding="14"
+                                Background="{DynamicResource ElevatedSurfaceBrush}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Visibility"
+                                            Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ShowEmptyState}"
+                                                     Value="True">
+                                            <Setter Property="Visibility"
+                                                    Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <TextBlock Foreground="{DynamicResource SubtleTextBrush}"
+                                       Text="{Binding EmptyStateText}" />
+                        </Border>
+                    </Grid>
+                </Grid>
+
+                <Border Grid.Column="1"
+                        Padding="12"
+                        Background="{DynamicResource ElevatedSurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="10">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0">
+                            <TextBlock FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Text="Preview Drawer" />
+                            <TextBlock Margin="0,4,0,0"
+                                       Foreground="{DynamicResource SubtleTextBrush}"
+                                       Text="Selected files are previewed here before cleanup." />
+                        </StackPanel>
+
+                        <WrapPanel Grid.Row="1"
+                                   Margin="0,10,0,0">
+                            <TextBlock Margin="0,0,12,0"
+                                       Foreground="{DynamicResource SubtleTextBrush}"
+                                       Text="{Binding SelectedCount, StringFormat=Items: {0:N0}}" />
+                            <TextBlock Foreground="{DynamicResource SubtleTextBrush}"
+                                       Text="{Binding SelectedBytes, Converter={StaticResource BytesToSizeConverter}, StringFormat=Size: {0}}" />
+                        </WrapPanel>
+
+                        <DataGrid Grid.Row="2"
+                                  Margin="0,10,0,10"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True"
+                                  ItemsSource="{Binding PreviewItems}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding Name, Mode=OneWay}"
+                                                    Header="Name"
+                                                    Width="*" />
+                                <DataGridTextColumn Binding="{Binding Type, Mode=OneWay}"
+                                                    Header="Type"
+                                                    Width="90" />
+                                <DataGridTextColumn Binding="{Binding SizeDisplay, Mode=OneWay}"
+                                                    Header="Size"
+                                                    Width="90" />
+                                <DataGridTextColumn Binding="{Binding Recommendation, Mode=OneWay}"
+                                                    Header="Recommendation"
+                                                    Width="110" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <WrapPanel Grid.Row="3">
+                            <Button Margin="0,0,8,0"
+                                    ToolTip="Open selected item in File Explorer"
+                                    Command="{Binding OpenSelectedPathCommand}"
+                                    Content="Open" />
+                            <Button Margin="0,0,8,0"
+                                    Command="{Binding PreviewDeleteSelectedCommand}"
+                                    Content="Preview" />
+                            <Button ToolTip="Deletes selected media to Recycle Bin after confirmation"
+                                    Command="{Binding DeleteSelectedCommand}"
+                                    Content="Clean Selected" />
+                        </WrapPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

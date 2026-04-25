@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\StorageCleaner.Core\StorageCleaner.Core.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>Assets\storage-cleaner-icon.ico</ApplicationIcon>
+    <AssemblyName>StorageCleaner</AssemblyName>
+    <RootNamespace>StorageCleaner.App</RootNamespace>
+    <Company>Damien van Vliet</Company>
+    <Product>Storage Cleaner</Product>
+    <Authors>Damien van Vliet</Authors>
+    <Description>Storage Cleaner scans disk usage and safely cleans files with preview-first workflows.</Description>
+    <Version>1.0.0</Version>
+    <FileVersion>1.0.0.0</FileVersion>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\storage-cleaner-icon.png" />
+    <None Include="Assets\storage-cleaner-icon.ico" />
+  </ItemGroup>
+
+</Project>

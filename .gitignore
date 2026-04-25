@@ -1,0 +1,35 @@
+# Build output
+**/bin/
+**/obj/
+out/
+artifacts/
+publish/
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Test output
+TestResults/
+coverage/
+*.trx
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+
+# Logs and local runtime data
+*.log
+*.cache
+*.tmp
+*.temp
+src/StorageCleaner.App/_logs/
+
+# OS files
+.DS_Store
+Thumbs.db
