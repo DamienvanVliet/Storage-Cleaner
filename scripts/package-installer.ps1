@@ -27,6 +27,7 @@ New-Item -Path (Join-Path $installerOutputDir "app") -ItemType Directory -Force 
 Copy-Item -Path (Join-Path $publishDir "*") -Destination (Join-Path $installerOutputDir "app") -Recurse -Force
 Copy-Item -Path (Join-Path $installerTemplateDir "Install-StorageCleaner.ps1") -Destination $installerOutputDir -Force
 Copy-Item -Path (Join-Path $installerTemplateDir "Uninstall-StorageCleaner.ps1") -Destination $installerOutputDir -Force
+Copy-Item -Path (Join-Path $installerTemplateDir "Detect-StorageCleaner.ps1") -Destination $installerOutputDir -Force
 
 $installCmdPath = Join-Path $installerOutputDir "Install-StorageCleaner.cmd"
 @"
@@ -42,6 +43,7 @@ Storage Cleaner Installer
 1) Double-click Install-StorageCleaner.cmd
 2) This installs Storage Cleaner and adds it to Start Menu + Installed Apps
 3) To uninstall later, run Uninstall-StorageCleaner.ps1
+4) For Intune script detection, use Detect-StorageCleaner.ps1
 "@ | Set-Content -Path $quickStartPath -Encoding UTF8
 
 $releaseDir = Join-Path $repoRoot "artifacts\releases"

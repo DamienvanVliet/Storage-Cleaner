@@ -92,6 +92,36 @@ Create installer release assets:
 .\scripts\package-all.ps1
 ```
 
+Create Intune Win32 package sources for one installer or a folder of installers:
+```powershell
+.\scripts\package-intune-win32.ps1 `
+  -SourceInstallerPath C:\Installers `
+  -IntuneWinAppUtilPath C:\Tools\IntuneWinAppUtil.exe
+```
+
+The script detects `.exe`, `.msi`, `.msp`, `.appx`, `.appxbundle`, `.msix`, `.msixbundle`, `.ps1`, `.cmd`, and `.bat` packages. It checks file headers where possible, reads MSI/AppX/EXE metadata, derives the app name/publisher/detection rule, copies each payload into `artifacts\intune\<AppName>\source`, and generates UTF-8 BOM PowerShell scripts for install, uninstall, and custom script detection.
+
+For Intune, use:
+```powershell
+powershell.exe -ExecutionPolicy Bypass -NoProfile -File .\Install-App.ps1
+powershell.exe -ExecutionPolicy Bypass -NoProfile -File .\Uninstall-App.ps1
+```
+
+Upload the generated `Detect-App.ps1` as the custom detection script. Its success path writes STDOUT and exits with code `0`; the absent path exits with code `1`. Generated scripts log to `%ProgramData%\<AppName>\Logs`, validate detection after installation, and use Intune-compatible return codes.
+
+Manual overrides remain available for edge cases:
+```powershell
+.\scripts\package-intune-win32.ps1 `
+  -SourceInstallerPath C:\Installers\ClaudeSetup.exe `
+  -AppName Claude `
+  -Publisher Anthropic `
+  -DetectionDisplayName Claude `
+  -DetectionExecutableName Claude.exe `
+  -DetectionInstallLocation "%LOCALAPPDATA%\Programs\Claude" `
+  -SilentInstallArguments "--silent" `
+  -SilentUninstallArguments "--uninstall --silent"
+```
+
 Sign release assets with your code-signing certificate:
 ```powershell
 .\scripts\sign-release.ps1 -PfxPath C:\path\your-cert.pfx -PfxPassword "your-password"
